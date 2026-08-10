@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SentiScope AI - Phân tích cảm xúc bình luận</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="header">
+
+        <div class="logo">
+            <i class="fa-solid fa-brain"></i>
+            <span>SentiScope AI</span>
+        </div>
+
+        <div class="header-right">
+            <span class="status">
+                <i class="fa-solid fa-circle"></i>
+                AI Ready
+            </span>
+        </div>
+
+    </header>
+
+    <!-- ================= HERO ================= -->
+
+    <section class="hero">
+
+        <div class="hero-left">
+
+            <span class="badge">
+                AI Sentiment Analysis
+            </span>
+
+            <h1>
+                Phân tích cảm xúc bình luận bằng AI
+            </h1>
+
+            <p>
+                Hệ thống sử dụng mô hình PhoBERT để phân tích cảm xúc, thống kê dữ liệu,
+                phát hiện chủ đề, trích xuất từ khóa và tạo báo cáo AI tự động.
+            </p>
+
+            <div class="hero-btn">
+
+                <button class="btn-primary" id="startBtn">
+                    Bắt đầu phân tích
+                </button>
+
+                <button class="btn-outline">
+                    PhoBERT
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="hero-right">
+
+            <div class="hero-card">
+
+                <h3>AI Dashboard</h3>
+
+                <ul>
+                    <li>✔ PhoBERT Sentiment</li>
+                    <li>✔ Keyword Extraction</li>
+                    <li>✔ Topic Detection</li>
+                    <li>✔ AI Summary</li>
+                    <li>✔ AI Report</li>
+                </ul>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ================= DASHBOARD ================= -->
+
+    <section class="dashboard">
+
+        <div class="dashboard-card">
+            <h4>AI Score</h4>
+            <h2 id="aiScore">0</h2>
+            <span id="aiLevel">--</span>
+        </div>
+
+        <div class="dashboard-card">
+            <h4>Confidence</h4>
+            <h2 id="confidence">0%</h2>
+        </div>
+
+        <div class="dashboard-card">
+            <h4>Tổng bình luận</h4>
+            <h2 id="totalReview">0</h2>
+        </div>
+
+        <div class="dashboard-card">
+            <h4>Xu hướng</h4>
+            <h2 id="trend">--</h2>
+        </div>
+
+        <div class="dashboard-card">
+            <h4>Rủi ro</h4>
+            <h2 id="risk">--</h2>
+        </div>
+
+        <div class="dashboard-card">
+            <h4>Mức hài lòng</h4>
+            <h2 id="satisfaction">--</h2>
+        </div>
+
+    </section>
+    <!-- ================= INPUT ================= -->
+
+    <section class="input-section" id="analyzeSection">
+
+        <div class="input-header">
+            <h2>Phân tích dữ liệu</h2>
+            <p>Nhập bình luận hoặc tải lên file CSV để bắt đầu phân tích.</p>
+        </div>
+
+        <div class="input-tabs">
+
+            <button class="tab-btn active" data-tab="text">
+                Văn bản
+            </button>
+
+            <button class="tab-btn" data-tab="csv">
+                CSV
+            </button>
+
+        </div>
+
+        <div id="textTab" class="tab-content active">
+
+            <textarea id="reviewInput" placeholder="Mỗi dòng là một bình luận..."></textarea>
+
+        </div>
+
+        <div id="csvTab" class="tab-content">
+            <div class="file-upload-box" onclick="openUploadModal()">
+                <div class="file-upload-info">
+                    <i class="fa-solid fa-cloud-arrow-up upload-icon-small"></i>
+                    <div>
+                        <strong id="selectedFileName">Chưa có tệp nào được chọn</strong>
+                        <p>Nhấp vào đây để chọn tệp hoặc kéo thả từ máy tính</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-primary">Chọn tệp</button>
+            </div>
+        </div>
+        </div>
+
+        <button id="analyzeBtn" class="btn-primary">
+
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            Phân tích bằng AI
+
+        </button>
+
+    </section>
+
+    <!-- ================= QUICK STAT ================= -->
+
+    <section class="quick-stat">
+
+        <div class="quick-card positive">
+
+            <span>😊</span>
+
+            <h3 id="positiveCount">0</h3>
+
+            <p>Tích cực</p>
+
+        </div>
+
+        <div class="quick-card neutral">
+
+            <span>😐</span>
+
+            <h3 id="neutralCount">0</h3>
+
+            <p>Trung lập</p>
+
+        </div>
+
+        <div class="quick-card negative">
+
+            <span>😞</span>
+
+            <h3 id="negativeCount">0</h3>
+
+            <p>Tiêu cực</p>
+
+        </div>
+
+    </section>
+
+    <!-- ================= CHART ================= -->
+
+    <section class="chart-section">
+
+        <div class="chart-card">
+
+            <div class="card-header">
+
+                <h3>Phân bố cảm xúc</h3>
+
+                <span>Doughnut Chart</span>
+
+            </div>
+            <div class="chart-container">
+                <canvas id="sentimentChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="card-header">
+                <h3>Thống kê cảm xúc</h3>
+                <span>Bar Chart</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+    </section>
+    <!-- ================= KEYWORDS & TOPICS ================= -->
+
+    <section class="analysis-grid">
+
+        <div class="analysis-card">
+
+            <div class="card-header">
+                <h3>Từ khóa nổi bật</h3>
+                <i class="fa-solid fa-tags"></i>
+            </div>
+
+            <div id="keywordList" class="tag-list"></div>
+
+        </div>
+
+        <div class="analysis-card">
+
+            <div class="card-header">
+                <h3>Chủ đề được quan tâm</h3>
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+
+            <div id="topicList" class="topic-list"></div>
+
+        </div>
+
+    </section>
+
+    <!-- ================= POSITIVE / NEGATIVE KEYWORDS ================= -->
+
+    <section class="analysis-grid">
+
+        <div class="analysis-card">
+
+            <div class="card-header">
+                <h3>Từ khóa tích cực</h3>
+                <span class="badge-success">Positive</span>
+            </div>
+
+            <div id="positiveKeywords" class="tag-list"></div>
+
+        </div>
+
+        <div class="analysis-card">
+
+            <div class="card-header">
+                <h3>Từ khóa tiêu cực</h3>
+                <span class="badge-danger">Negative</span>
+            </div>
+
+            <div id="negativeKeywords" class="tag-list"></div>
+
+        </div>
+
+    </section>
+
+    <!-- ================= AI REPORT ================= -->
+
+    <section class="ai-report">
+
+        <div class="section-title">
+
+            <h2>
+                <i class="fa-solid fa-robot"></i>
+                Báo cáo AI
+            </h2>
+
+            <p>Kết quả tổng hợp từ mô hình PhoBERT</p>
+
+        </div>
+
+        <div class="report-card">
+
+            <h3>
+                <i class="fa-solid fa-chart-line"></i>
+                Tổng quan
+            </h3>
+
+            <p id="overview">
+                Chưa có dữ liệu để phân tích.
+            </p>
+
+        </div>
+
+        <div class="report-grid">
+
+            <div class="report-card">
+
+                <h3>
+                    <i class="fa-solid fa-circle-check"></i>
+                    Điểm mạnh
+                </h3>
+
+                <ul id="strengthList"></ul>
+
+            </div>
+
+            <div class="report-card">
+
+                <h3>
+                    <i class="fa-solid fa-circle-xmark"></i>
+                    Điểm cần cải thiện
+                </h3>
+
+                <ul id="weaknessList"></ul>
+
+            </div>
+
+        </div>
+
+        <div class="report-card">
+
+            <h3>
+                <i class="fa-solid fa-lightbulb"></i>
+                AI Insight
+            </h3>
+
+            <ul id="insightList"></ul>
+
+        </div>
+
+        <div class="report-card">
+
+            <h3>
+                <i class="fa-solid fa-bullseye"></i>
+                Khuyến nghị
+            </h3>
+
+            <ul id="recommendationList"></ul>
+
+        </div>
+
+        <div class="conclusion-card">
+
+            <h3>Kết luận</h3>
+
+            <div class="result-score">
+                <span id="grade">A</span>
+            </div>
+
+            <h2 id="rating">Excellent</h2>
+
+            <p id="conclusion">
+                Chưa có dữ liệu để phân tích.
+            </p>
+
+        </div>
+
+    </section>
+    <!-- ================= AI SUMMARY ================= -->
+
+    <section class="summary-section">
+
+        <div class="section-title">
+
+            <h2>
+                <i class="fa-solid fa-file-lines"></i>
+                Tóm tắt AI
+            </h2>
+
+        </div>
+
+        <div class="summary-card">
+
+            <p id="summaryText">
+                AI sẽ tự động tổng hợp nội dung sau khi phân tích.
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- ================= REVIEW LIST ================= -->
+
+    <section class="review-section">
+
+        <div class="section-title">
+
+            <h2>
+                <i class="fa-solid fa-comments"></i>
+                Kết quả phân tích từng bình luận
+            </h2>
+
+        </div>
+
+        <div id="reviewContainer"></div>
+
+    </section>
+
+    <!-- ================= LOADING ================= -->
+
+    <div id="loadingOverlay" class="loading-overlay">
+
+        <div class="loading-box">
+
+            <div class="loader"></div>
+
+            <h3>AI đang phân tích...</h3>
+
+            <p>Vui lòng chờ trong giây lát.</p>
+
+        </div>
+
+    </div>
+
+    <!-- ================= TOAST ================= -->
+
+    <div id="toast" class="toast">
+
+        <i class="fa-solid fa-circle-check"></i>
+
+        <span id="toastMessage">
+            Phân tích thành công.
+        </span>
+
+    </div>
+
+    <!-- ================= REVIEW MODAL ================= -->
+
+    <div id="reviewModal" class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h3>Chi tiết bình luận</h3>
+
+                <button id="closeModal">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <p id="modalReview"></p>
+
+                <div class="modal-result">
+
+                    <span id="modalSentiment"></span>
+
+                    <span id="modalConfidence"></span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= SCROLL TOP ================= -->
+
+    <button id="scrollTopBtn">
+
+        <i class="fa-solid fa-arrow-up"></i>
+
+    </button>
+
+    <div id="uploadModal" class="upload-modal-overlay">
+        <div class="upload-modal-container">
+            <div class="upload-modal-header">
+                <h3>Tải lên tệp</h3>
+                <button type="button" class="close-btn" onclick="closeUploadModal()">&times;</button>
+            </div>
+
+            <div class="upload-modal-body">
+                <div class="drop-zone" id="dropZone">
+                    <div class="cloud-illustration">
+                        <svg width="120" height="90" viewBox="0 0 120 90" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M92.5 40.5C92.5 24.2 79.3 11 63 11C49.2 11 37.6 20.5 34.4 33.3C21.7 34.8 12 45.6 12 58.8C12 73.1 23.6 84.8 38 84.8H91.5C104.5 84.8 115 74.3 115 61.3C115 49.3 105.1 40.9 92.5 40.5Z"
+                                fill="url(#cloud_grad)" />
+                            <path d="M60 68V42M60 42L48 54M60 42L72 54" stroke="#1e293b" stroke-width="4"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <defs>
+                                <linearGradient id="cloud_grad" x1="12" y1="11" x2="115" y2="84.8"
+                                    gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#4ade80" />
+                                    <stop offset="50%" stop-color="#38bdf8" />
+                                    <stop offset="100%" stop-color="#6366f1" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <button type="button" class="btn-browse"
+                        onclick="document.getElementById('fileInput').click()">Duyệt qua</button>
+                    <p class="drop-text">hoặc kéo tệp để tải lên từ máy tính của bạn</p>
+                    <input type="file" id="fileInput" hidden onchange="handleFileSelect(event)">
+                </div>
+
+                <div id="modalFileInfo" class="modal-file-info"></div>
+            </div>
+
+            <div class="upload-modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeUploadModal()">Hủy</button>
+                <button type="button" class="btn-primary" onclick="confirmFileUpload()">Xác nhận tệp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer class="footer">
+
+        <div class="footer-content">
+
+            <h3>SentiScope AI</h3>
+
+            <p>
+                Ứng dụng hỗ trợ phân tích cảm xúc bình luận bằng trí tuệ nhân tạo.
+            </p>
+
+            <div class="footer-info">
+
+                <span>PhoBERT</span>
+
+                <span>Flask API</span>
+
+                <span>HTML • CSS • JavaScript</span>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+        const API_URL = "http://127.0.0.1:5000/analyze";
+
+        let sentimentChart = null;
+        let barChart = null;
+
+        const loadingOverlay = document.getElementById("loadingOverlay");
+        const toast = document.getElementById("toast");
+        const toastMessage = document.getElementById("toastMessage");
+
+        const reviewInput = document.getElementById("reviewInput");
+        const csvFile = document.getElementById("fileInput");
+
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+
+            btn.addEventListener("click", function () {
+
+                document.querySelectorAll(".tab-btn").forEach(b => {
+                    b.classList.remove("active");
+                });
+
+                document.querySelectorAll(".tab-content").forEach(tab => {
+                    tab.classList.remove("active");
+                });
+
+                this.classList.add("active");
+
+                if (this.dataset.tab === "text") {
+                    document.getElementById("textTab").classList.add("active");
+                } else {
+                    document.getElementById("csvTab").classList.add("active");
+                }
+
+            });
+
+        });
+
+        document.getElementById("analyzeBtn").addEventListener("click", analyzeData);
+
+        function showLoading() {
+            loadingOverlay.style.display = "flex";
+        }
+
+        function hideLoading() {
+            loadingOverlay.style.display = "none";
+        }
+
+        function showToast(message) {
+
+            toastMessage.textContent = message;
+
+            toast.classList.add("show");
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+
+        }
+        async function analyzeData() {
+
+            const formData = new FormData();
+
+            const activeTab = document.querySelector(".tab-btn.active").dataset.tab;
+
+            formData.append("type", activeTab);
+
+            if (activeTab === "text") {
+
+                const text = reviewInput.value.trim();
+
+                if (text === "") {
+                    showToast("Vui lòng nhập bình luận.");
+                    return;
+                }
+
+                formData.append("text", text);
+
+            } else {
+
+                const file = csvFile.files[0];
+
+                if (!file) {
+                    showToast("Vui lòng chọn file CSV.");
+                    return;
+                }
+
+                formData.append("file", file);
+
+            }
+
+            showLoading();
+
+            try {
+
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                hideLoading();
+
+                if (!data.success) {
+                    showToast(data.message || "Phân tích thất bại.");
+                    return;
+                }
+
+                updateDashboard(data);
+                updateCharts(data);
+
+                updateKeywords(data);
+                updateTopics(data);
+
+                updatePositiveKeywords(data);
+                updateNegativeKeywords(data);
+
+                updateSummary(data);
+
+                updateAIReport(data);
+
+                updateConclusion(data);
+
+                renderReviews(data.reviews);
+
+                showToast("Phân tích thành công.");
+
+            } catch (error) {
+
+                hideLoading();
+
+                console.error(error);
+
+                showToast("Không thể kết nối Backend.");
+
+            }
+
+        }
+        function updateDashboard(data) {
+
+            const s = data.statistics;
+            const d = data.dashboard;
+
+            document.getElementById("aiScore").textContent = d.ai_score;
+            document.getElementById("aiLevel").textContent = d.level;
+            document.getElementById("confidence").textContent = d.confidence + "%";
+            document.getElementById("totalReview").textContent = s.total;
+            document.getElementById("trend").textContent = d.trend;
+            document.getElementById("risk").textContent = d.risk;
+            document.getElementById("satisfaction").textContent = d.satisfaction;
+
+            document.getElementById("positiveCount").textContent = s.positive;
+            document.getElementById("neutralCount").textContent = s.neutral;
+            document.getElementById("negativeCount").textContent = s.negative;
+
+        }
+
+        function drawCharts() {
+            const pieCtx = document.getElementById("sentimentChart").getContext("2d");
+
+            sentimentChart = new Chart(pieCtx, {
+                type: "doughnut",
+                data: {
+                    labels: ["Tích cực", "Trung lập", "Tiêu cực"],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ["#22c55e", "#facc15", "#ef4444"],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Bắt buộc: Giúp chart tròn đẹp theo khung CSS
+                    plugins: {
+                        legend: {
+                            position: "bottom"
+                        }
+                    }
+                }
+            });
+
+            const barCtx = document.getElementById("barChart").getContext("2d");
+
+            barChart = new Chart(barCtx, {
+                type: "bar",
+                data: {
+                    labels: ["Tích cực", "Trung lập", "Tiêu cực"],
+                    datasets: [{
+                        label: "Số bình luận",
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            "#22c55e",
+                            "#facc15",
+                            "#ef4444"
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Bắt buộc: Giữ dáng biểu đồ cột
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        const barCtx = document.getElementById("barChart").getContext("2d");
+
+        barChart = new Chart(barCtx, {
+            type: "bar",
+            data: {
+                labels: ["Tích cực", "Trung lập", "Tiêu cực"],
+                datasets: [{
+                    label: "Số bình luận",
+                    data: [0, 0, 0],
+                    backgroundColor: [
+                        "#22c55e",
+                        "#facc15",
+                        "#ef4444"
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        function updateCharts(data) {
+
+            const s = data.statistics;
+
+            sentimentChart.data.datasets[0].data = [
+                s.positive,
+                s.neutral,
+                s.negative
+            ];
+
+            sentimentChart.update();
+
+            barChart.data.datasets[0].data = [
+                s.positive,
+                s.neutral,
+                s.negative
+            ];
+
+            barChart.update();
+
+        }
+        function updateKeywords(data) {
+
+            const keywordBox = document.getElementById("keywordList");
+            keywordBox.innerHTML = "";
+
+            if (!data.keywords || data.keywords.length === 0) {
+                keywordBox.innerHTML = "<p>Chưa có dữ liệu.</p>";
+                return;
+            }
+
+            data.keywords.forEach(item => {
+
+                keywordBox.innerHTML += `
+        <span class="keyword-tag">
+            ${item.keyword}
+            <small>${item.count}</small>
+        </span>
+    `;
+
+            });
+
+        }
+
+        function updateTopics(data) {
+
+            const topicBox = document.getElementById("topicList");
+            topicBox.innerHTML = "";
+
+            if (!data.topics || data.topics.length === 0) {
+                topicBox.innerHTML = "<p>Chưa có chủ đề.</p>";
+                return;
+            }
+
+            data.topics.forEach(item => {
+
+                topicBox.innerHTML += `
+        <div class="topic-item">
+            <i class="fa-solid fa-folder-open"></i>
+            ${item.topic}
+        </div>
+    `;
+
+            });
+
+        }
+
+        function updatePositiveKeywords(data) {
+
+            const box = document.getElementById("positiveKeywords");
+            box.innerHTML = "";
+
+            if (!data.positive_keywords) return;
+
+            data.positive_keywords.forEach(item => {
+
+                box.innerHTML += `
+        <span class="keyword-tag positive">
+            ${item}
+        </span>
+    `;
+
+            });
+
+        }
+
+        function updateNegativeKeywords(data) {
+
+            const box = document.getElementById("negativeKeywords");
+            box.innerHTML = "";
+
+            if (!data.negative_keywords) return;
+
+            data.negative_keywords.forEach(item => {
+
+                box.innerHTML += `
+        <span class="keyword-tag negative">
+            ${item}
+        </span>
+    `;
+
+            });
+
+        }
+
+        function updateSummary(data) {
+
+            const summary = document.getElementById("summaryText");
+
+            if (!data.summary) {
+                summary.textContent = "Không có dữ liệu để tóm tắt.";
+                return;
+            }
+
+            summary.textContent = data.summary;
+
+        }
+
+        function updateAIReport(data) {
+
+            if (!data.ai_report) return;
+
+            const report = data.ai_report;
+
+            document.getElementById("overview").textContent = report.overview || "";
+
+            const strengthList = document.getElementById("strengthList");
+            const weaknessList = document.getElementById("weaknessList");
+            const recommendationList = document.getElementById("recommendationList");
+            const insightList = document.getElementById("insightList");
+
+            strengthList.innerHTML = "";
+            weaknessList.innerHTML = "";
+            recommendationList.innerHTML = "";
+            insightList.innerHTML = "";
+
+            if (report.strengths) {
+
+                report.strengths.forEach(item => {
+                    strengthList.innerHTML += `<li>${item}</li>`;
+                });
+
+            }
+
+            if (report.weaknesses) {
+
+                report.weaknesses.forEach(item => {
+                    weaknessList.innerHTML += `<li>${item}</li>`;
+                });
+
+            }
+
+            if (report.recommendations) {
+
+                report.recommendations.forEach(item => {
+                    recommendationList.innerHTML += `<li>${item}</li>`;
+                });
+
+            }
+
+            if (report.insights) {
+
+                report.insights.forEach(item => {
+                    insightList.innerHTML += `<li>${item}</li>`;
+                });
+
+            }
+
+        }
+        function updateConclusion(data) {
+
+            const score = data.dashboard.ai_score;
+
+            let grade = "C";
+            let rating = "Need Improvement";
+            let conclusion = "Sản phẩm có nhiều phản hồi tiêu cực, cần được cải thiện.";
+
+            if (score >= 90) {
+
+                grade = "A";
+                rating = "Excellent";
+                conclusion = "Sản phẩm nhận được rất nhiều phản hồi tích cực và được người dùng đánh giá cao.";
+
+            } else if (score >= 70) {
+
+                grade = "B";
+                rating = "Good";
+                conclusion = "Sản phẩm nhìn chung được đánh giá tốt nhưng vẫn còn một số điểm cần cải thiện.";
+
+            }
+
+            document.getElementById("grade").textContent = grade;
+            document.getElementById("rating").textContent = rating;
+            document.getElementById("conclusion").textContent = conclusion;
+
+        }
+
+        function renderReviews(reviews) {
+
+            const container = document.getElementById("reviewContainer");
+
+            container.innerHTML = "";
+
+            if (!reviews || reviews.length === 0) {
+
+                container.innerHTML = "<p>Chưa có dữ liệu.</p>";
+                return;
+
+            }
+
+            reviews.forEach(item => {
+
+                let css = "neutral";
+
+                if (item.sentiment === "Tích cực") css = "positive";
+                if (item.sentiment === "Tiêu cực") css = "negative";
+
+                container.innerHTML += `
+    <div class="review-card ${css}">
+        <div class="review-top">
+            <div class="review-user">
+                <div class="avatar">${item.emoji}</div>
+                <div>
+                    <h3>Bình luận</h3>
+                    <span>PhoBERT</span>
+                </div>
+            </div>
+
+            <span class="badge ${css}">
+                ${item.sentiment}
+            </span>
+        </div>
+
+        <p class="review-content">
+            ${item.text}
+        </p>
+
+        <div class="review-footer">
+            <span>Confidence: ${item.confidence}%</span>
+        </div>
+    </div>
+    `;
+
+            });
+
+        }
+
+        const scrollBtn = document.getElementById("scrollTopBtn");
+
+        window.addEventListener("scroll", () => {
+
+            if (window.scrollY > 300) {
+
+                scrollBtn.classList.add("show");
+
+            } else {
+
+                scrollBtn.classList.remove("show");
+
+            }
+
+        });
+
+        scrollBtn.addEventListener("click", () => {
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        });
+
+        document.getElementById("startBtn").addEventListener("click", () => {
+
+            document.getElementById("analyzeSection").scrollIntoView({
+                behavior: "smooth"
+            });
+
+        });
+
+        window.onload = function () {
+
+            drawCharts();
+
+            hideLoading();
+
+        }
+        // DÁN VÀO CUỐI FILE JS CỦA BẠN
+        let currentSelectedFile = null;
+
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('show');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('show');
+        }
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                processSelectedFile(files[0]);
+            }
+        }
+
+        const dropZone = document.getElementById('dropZone');
+
+        if (dropZone) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.add('drag-over');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.remove('drag-over');
+                }, false);
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length > 0) {
+                    document.getElementById('fileInput').files = files;
+                    processSelectedFile(files[0]);
+                }
+            });
+        }
+
+        function processSelectedFile(file) {
+            currentSelectedFile = file;
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            document.getElementById('modalFileInfo').innerHTML = `
+        <i class="fa-solid fa-file-circle-check"></i> Đã chọn: <strong>${file.name}</strong> (${fileSizeMB} MB)
+    `;
+        }
+
+        function confirmFileUpload() {
+            if (currentSelectedFile) {
+                document.getElementById('selectedFileName').innerText = currentSelectedFile.name;
+                closeUploadModal();
+            } else {
+                alert("Vui lòng chọn hoặc kéo thả một tệp trước!");
+            }
+        }
+    </script>
+
+
+</body>
+
+</html>
